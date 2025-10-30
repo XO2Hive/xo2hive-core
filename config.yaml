@@ -1,0 +1,4 @@
+listen: ":50051"
+session_queue_size: 64
+session_send_timeout: 2s
+max_sessions: 500

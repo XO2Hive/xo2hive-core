@@ -1,0 +1,51 @@
+syntax = "proto3";
+
+
+package core.v1;
+
+
+// go_package legt das Zielpaket für die generierten Go-Dateien fest.
+option go_package = "proto/core/v1;v1";
+
+
+// Frame ist das universelle Datenpaket. Es ist absichtlich generisch gehalten, damit
+// beliebige Plugins/Clients es für eigene Zwecke nutzen können.
+message Frame {
+    // Typ des Frames (z. B. "HELLO", "EVENT", "PUBLISH").
+    string type = 1;
+
+
+    // Absender-ID (wird i. d. R. vom Core vergeben). Kann leer sein bei der ersten Nachricht.
+    string from = 2;
+
+
+    // Ziel-ID. Leer = Broadcast an alle außer Absender.
+    string to = 3;
+
+
+    // Freies Topic-Feld zur logischen Gruppierung.
+    string topic = 4;
+
+
+    // Nutzdaten als Bytes (z. B. JSON-kodiert).
+    bytes payload = 5;
+
+
+    // Sequenznummer (optional nutzbar durch Clients).
+    uint64 seq = 6;
+
+
+    // Unix-Timestamp in Millisekunden, gesetzt vom Client oder Core.
+    int64 ts_unix_ms = 7;
+
+
+    // Beliebige Metadaten als Key/Value.
+    map<string, string> meta = 8;
+}
+
+
+service Realtime {
+    // Connect stellt eine **bidi-streaming** Verbindung her.
+    // Beide Seiten (Client und Core) können jederzeit Frames senden.
+    rpc Connect(stream Frame) returns (stream Frame);
+}
